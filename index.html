@@ -164,7 +164,7 @@
             <!-- Single Entry Fields -->
             <div class="form-group">
                 <label for="date">Date:</label>
-                <input type="date" id="date" name="date" required>
+                <input type="text" id="date" name="date" required>
             </div>
 
             <!-- WI No -->
@@ -251,6 +251,19 @@
     </div>
 
     <script>
+        // Function to set today's date in DD-MM-YYYY format
+        function setTodaysDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+            const day = String(today.getDate()).padStart(2, "0");
+            const todayDate = `${day}-${month}-${year}`; // Format: DD-MM-YYYY
+            document.getElementById("date").value = todayDate;
+        }
+
+        // Call the function to set today's date when the page loads
+        setTodaysDate();
+
         let progressEntries = [];
 
         // Activity lists based on discipline
@@ -454,6 +467,7 @@
                 progressEntries = [];
                 updateProgressTable();
                 document.getElementById("progressForm").reset();
+                setTodaysDate(); // Reset the date to today's date after submission
             })
             .catch(error => {
                 alert("Error: " + error);
