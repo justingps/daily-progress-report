@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>GPS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Add Favicon -->
+    <link rel="icon" type="image/png" href="https://justingps.github.io/dpr/favicon.png">
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .logo {
+            max-width: 100px;
+            margin-right: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        textarea {
+            resize: vertical;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .btn {
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 180px;
+        }
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .btn-add {
+            background-color: #4CAF50;
+        }
+        .btn-remove {
+            background-color: #f44336;
+        }
+        .resource-entry {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .resource-entry input {
+            flex: 1;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .modal-content label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .modal-buttons button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .modal-buttons .btn-confirm {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .modal-buttons .btn-cancel {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="logo.png" alt="Logo" class="logo">
+            <div>
+                <h2>DAILY PROGRESS REPORT</h2>
+            </div>
+        </div>
+
+        <form id="progressForm">
+            <!-- Single Entry Fields -->
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+
+            <!-- WI No -->
+            <div class="form-group">
+                <label for="wiNo">WI No:</label>
+                <input type="text" id="wiNo" name="wiNo" required>
+            </div>
+
+            <!-- Foreman ID -->
+            <div class="form-group">
+                <label for="foremanID">Foreman ID:</label>
+                <input type="text" id="foremanID" name="foremanID" required>
+            </div>
+
+            <!-- Progress Details -->
+            <div class="form-group">
+                <label for="progressDetails">Progress Details:</label>
+                <table id="progressTable">
+                    <thead>
+                        <tr>
+                            <th>Discipline</th>
+                            <th>Activity</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Entries will be added here dynamically -->
+                    </tbody>
+                </table>
+                <div class="button-container">
+                    <button type="button" class="btn btn-add" onclick="openProgressModal()">Add Entry</button>
+                    <button type="button" class="btn btn-remove" onclick="removeLastEntry()">Remove</button>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-add" id="submitButton">Submit</button>
+        </form>
+    </div>
+
+    <!-- Modal for Progress Details Input -->
+    <div id="progressModal" class="modal">
+        <div class="modal-content">
+            <label for="modalDiscipline">Discipline:</label>
+            <select id="modalDiscipline" onchange="updateActivityDropdown()" required>
+                <option value="">Select Discipline</option>
+                <option value="CIVIL">CIVIL</option>
+                <option value="PIPING STRUCTURAL & MECHANICAL">PIPING STRUCTURAL & MECHANICAL</option>
+                <option value="ELECTRICAL">ELECTRICAL</option>
+                <option value="INSTRUMENTATION">INSTRUMENTATION</option>
+                <option value="COMMISSIONING">COMMISSIONING</option>
+                <option value="SCAFFOLDING">SCAFFOLDING</option>
+                <option value="DEMOLITION">DEMOLITION</option>
+                <option value="SHUTDOWN">SHUTDOWN</option>
+            </select>
+
+            <label for="modalActivity">Activity:</label>
+            <select id="modalActivity" required>
+                <option value="">Select Activity</option>
+                <!-- Activities will be populated dynamically based on discipline -->
+            </select>
+
+            <label for="modalQuantity">Quantity:</label>
+            <input type="number" id="modalQuantity" placeholder="Enter Quantity" required>
+
+            <label for="modalUnit">Unit:</label>
+            <select id="modalUnit" required>
+                <option value="">Select Unit</option>
+                <option value="M">M</option>
+                <option value="M2">M2</option>
+                <option value="M3">M3</option>
+                <option value="NO">NO</option>
+                <option value="T">T</option>
+                <option value="KG">KG</option>
+                <option value="IN. DIA">IN. DIA</option>
+            </select>
+
+            <div class="modal-buttons">
+                <button class="btn-confirm" onclick="addEntry()">Confirm</button>
+                <button class="btn-cancel" onclick="closeProgressModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let progressEntries = [];
+
+        // Activity lists based on discipline
+        const activities = {
+            "CIVIL": [
+                "SURVEY & MARKING",
+                "TRIAL PIT EXCAVATION",
+                "EXCAVATION (MANUAL)",
+                "EXCAVATION (MECHANICAL)",
+                "PROTECTIVE COATING",
+                "FOUNDATION INSTALLATION",
+                "BACKFILLING",
+                "COMPACTION",
+                "REINFORCEMENT",
+                "FORMWORK",
+                "CONCRETING",
+                "CORE DRILLING"
+            ],
+            "PIPING STRUCTURAL & MECHANICAL": [
+                "PIPING ERECTION",
+                "FLOWLINE ERECTION",
+                "FLOWLINE WELDING",
+                "NDT",
+                "HYDROTESTING",
+                "REINSTATEMENT OF SPOOLS",
+                "TORQUING",
+                "SUPPORT STRUCTURE INSTALLATION",
+                "SUPPORT STRUCTURE FABRICATION",
+                "PAINTING",
+                "PIPING FABRICATION",
+                "EXTERNAL PAINTING",
+                "SPOOLS INSTALLATION",
+                "SHOP WELD",
+                "FIELD WELDING",
+                "VALVES INSTALLATION",
+                "REINSTATEMENT"
+            ],
+            "ELECTRICAL": [
+                "CONTROL CABLE LAYING",
+                "HV CABLE LAYING",
+                "LV CABLE LAYING",
+                "CABLE GLANDING",
+                "CABLE TERMINATION",
+                "LIGHT POLE INSTALLATION",
+                "LIGHT FIXTURE INSTALLATION",
+                "DB INSTALLATION",
+                "JB INSTALLATION",
+                "OUTDOOR UNIT INSTALLATION",
+                "INDOOR (FLOOR STANDING) UNIT INSTALLATION",
+                "EARTH PIT INSTALLATION",
+                "EARTH BOSS INSTALLATION",
+                "ISOLATOR SUPPORT FABRICATION",
+                "ISOLATOR INSTALLATION",
+                "TRAY AND TRUNKING INSTALLATION"
+            ],
+            "INSTRUMENTATION": [
+                "CABLE LAYING",
+                "CABLE GLANDING",
+                "CABLE TERMINATION",
+                "F&G INSTALLATION",
+                "JB INSTALLATION",
+                "PLC PANEL INSTALLATION",
+                "IFB PANEL INSTALLATION",
+                "PATCH PANEL INSTALLATION",
+                "PLC INTERNAL WIRING",
+                "IFM MODULE INSTALLATION",
+                "TUBING",
+                "TRAY AND TRUNKING INSTALLATION"
+            ],
+            "COMMISSIONING": [
+                "LOOP TESTING",
+                "FUNCTION TEST",
+                "CALIBRATION"
+            ],
+            "SCAFFOLDING": [
+                "ERECTION",
+                "DISMANTLING"
+            ],
+            "DEMOLITION": [
+                "FOUNDATION",
+                "CABLES",
+                "INSTRUMENTS"
+            ],
+            "SHUTDOWN": [
+                "TIE-INS"
+            ]
+        };
+
+        // Function to update the activity dropdown based on selected discipline
+        function updateActivityDropdown() {
+            const discipline = document.getElementById("modalDiscipline").value;
+            const activityDropdown = document.getElementById("modalActivity");
+            activityDropdown.innerHTML = '<option value="">Select Activity</option>';
+
+            if (discipline && activities[discipline]) {
+                activities[discipline].forEach(activity => {
+                    const option = document.createElement("option");
+                    option.value = activity;
+                    option.textContent = activity;
+                    activityDropdown.appendChild(option);
+                });
+            }
+        }
+
+        // Function to open the modal
+        function openProgressModal() {
+            document.getElementById("progressModal").style.display = "flex";
+        }
+
+        // Function to close the modal
+        function closeProgressModal() {
+            document.getElementById("progressModal").style.display = "none";
+            document.getElementById("modalDiscipline").value = ""; // Reset
+            document.getElementById("modalActivity").innerHTML = '<option value="">Select Activity</option>'; // Reset
+            document.getElementById("modalQuantity").value = ""; // Reset
+            document.getElementById("modalUnit").value = ""; // Reset
+        }
+
+        // Add entry to the table
+        function addEntry() {
+            const discipline = document.getElementById("modalDiscipline").value;
+            const activity = document.getElementById("modalActivity").value;
+            const quantity = document.getElementById("modalQuantity").value;
+            const unit = document.getElementById("modalUnit").value;
+
+            if (discipline && activity && quantity && unit) {
+                progressEntries.push({
+                    discipline: discipline,
+                    activity: activity,
+                    quantity: quantity,
+                    unit: unit
+                });
+                updateProgressTable();
+                closeProgressModal(); // Close the modal after adding
+            } else {
+                alert("Please fill in all fields.");
+            }
+        }
+
+        // Remove the last entry
+        function removeLastEntry() {
+            if (progressEntries.length > 0) {
+                progressEntries.pop();
+                updateProgressTable();
+            } else {
+                alert("No entries to remove.");
+            }
+        }
+
+        // Update the progress table
+        function updateProgressTable() {
+            const tbody = document.querySelector("#progressTable tbody");
+            tbody.innerHTML = progressEntries.map(entry => `
+                <tr>
+                    <td>${entry.discipline}</td>
+                    <td>${entry.activity}</td>
+                    <td>${entry.quantity}</td>
+                    <td>${entry.unit}</td>
+                </tr>
+            `).join("");
+        }
+
+        // Handle form submission
+        document.getElementById("progressForm").onsubmit = function(e) {
+            e.preventDefault();
+
+            if (progressEntries.length === 0) {
+                alert("Please add at least one entry.");
+                return;
+            }
+
+            const submitButton = document.getElementById("submitButton");
+            submitButton.disabled = true;
+            submitButton.innerText = "Submitting...";
+
+            const postingDateTime = new Date().toISOString().slice(0, 19).replace("T", " ");
+
+            const formData = {
+                date: document.getElementById("date").value,
+                wiNo: document.getElementById("wiNo").value,
+                foremanID: document.getElementById("foremanID").value,
+                progressEntries: progressEntries,
+                postingDateTime: postingDateTime,
+                deviceDetails: {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform
+                }
+            };
+
+            const queryParams = new URLSearchParams();
+            for (const [key, value] of Object.entries(formData)) {
+                queryParams.set(key, typeof value === "object" ? JSON.stringify(value) : value);
+            }
+
+            fetch(`https://script.google.com/macros/s/AKfycbzCk6zZXjpLA3ljFMXGAUYQ7M7E393VF_AeW1H7X5c5hpOQQIuuvX4UL0vcY1dKePb9tA/exec?${queryParams.toString()}`, {
+                method: "GET",
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert("Data Submitted Successfully!");
+                progressEntries = [];
+                updateProgressTable();
+                document.getElementById("progressForm").reset();
+            })
+            .catch(error => {
+                alert("Error: " + error);
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.innerText = "Submit";
+            });
+        };
+    </script>
+</body>
+</html>
