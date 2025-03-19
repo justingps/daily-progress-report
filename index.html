@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head> 
+<head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>GPS</title>
+    <title>Daily Progress Report</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Add Favicon -->
     <link rel="icon" type="image/png" href="https://justingps.github.io/dpr/favicon.png">
@@ -164,7 +164,7 @@
             <!-- Single Entry Fields -->
             <div class="form-group">
                 <label for="date">Date:</label>
-                <input type="text" id="date" name="date" required>
+                <input type="date" id="date" name="date" required>
             </div>
 
             <!-- WI No -->
@@ -223,10 +223,12 @@
             </select>
 
             <label for="modalActivity">Activity:</label>
-            <select id="modalActivity" required>
+            <select id="modalActivity" onchange="toggleCustomActivityInput()" required>
                 <option value="">Select Activity</option>
                 <!-- Activities will be populated dynamically based on discipline -->
+                <option value="Other">Other</option>
             </select>
+            <input type="text" id="customActivity" placeholder="Enter Custom Activity" style="display: none;">
 
             <label for="modalQuantity">Quantity:</label>
             <input type="number" id="modalQuantity" placeholder="Enter Quantity" required>
@@ -251,20 +253,10 @@
     </div>
 
     <script>
-        // Function to set today's date in DD-MM-YYYY format
-        function setTodaysDate() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-based
-            const day = String(today.getDate()).padStart(2, "0");
-            const todayDate = `${day}-${month}-${year}`; // Format: DD-MM-YYYY
-            document.getElementById("date").value = todayDate;
-        }
-
-        // Call the function to set today's date when the page loads
-        setTodaysDate();
-
         let progressEntries = [];
+
+        // Set today's date as default
+        document.getElementById("date").valueAsDate = new Date();
 
         // Activity lists based on discipline
         const activities = {
@@ -319,19 +311,133 @@
                 "ISOLATOR INSTALLATION",
                 "TRAY AND TRUNKING INSTALLATION"
             ],
-            "INSTRUMENTATION": [
-                "CABLE LAYING",
-                "CABLE GLANDING",
-                "CABLE TERMINATION",
-                "F&G INSTALLATION",
+
+"INSTRUMENTATION": [
+                "CABEL LAYING |1 PAIR X1.5 SQMM",
+                "CABEL LAYING |2 PAIR X1.5 SQMM",
+                "CABEL LAYING |5 PAIR X.75 SQMM",
+                "CABEL LAYING |5 PAIR X1.5 SQMM",
+                "CABEL LAYING |10 PAIR X1 SQMM",
+                "CABEL LAYING |10 PAIR X1.5 SQMM",
+                "CABEL LAYING |20 PAIR X1.5 SQMM",
+                "CABEL LAYING |2 CORE X 2.5 SQ MM",
+                "CABEL LAYING |21COREX2.5 SQ.MM",
+                "CABEL LAYING |FOC 4 CORE",
+                "CABEL LAYING |FOC 12 CORE",
+                "CABEL LAYING |FOC 24 CORE",
+                "CABEL LAYING |CAT-6/6E",
+                "CABEL LAYING |MODBUS RS-485",
+                "GLANDING & TERMINATION | 1 PAIR X1.5 SQMM",
+                "GLANDING & TERMINATION | 2 PAIR X1.5 SQMM",
+                "GLANDING & TERMINATION | 5 PAIR X.75 SQMM",
+                "GLANDING & TERMINATION | 5 PAIR X1.5 SQMM",
+                "GLANDING & TERMINATION | 10 PAIR X1 SQMM",
+                "GLANDING & TERMINATION | 10 PAIR X1.5 SQMM",
+                "GLANDING & TERMINATION | 20 PAIR X1.5 SQMM",
+                "GLANDING & TERMINATION | 2 CORE X 2.5 SQ MM",
+                "GLANDING & TERMINATION | 21COREX2.5 SQ.MM",
+                "GLANDING & TERMINATION | FOC 4 CORE",
+                "GLANDING & TERMINATION | FOC 12 CORE",
+                "GLANDING & TERMINATION | FOC 24 CORE",
+                "GLANDING & TERMINATION | CAT-6/6E",
+                "GLANDING & TERMINATION | MODBUS RS-485",
+                "EARTH CABLE, LAYING | 1C X 25 SQMM",
+                "EARTH CABLE, LAYING | 1C X 6 SQMM",
+                "EARTH CABLE, LAYING | 1 X 2.5 SQMM",
+                "EARTH CABLE, TERMINATION | 1C X 25 SQMM",
+                "EARTH CABLE, TERMINATION | 1C X 6 SQMM",
+                "EARTH CABLE, TERMINATION | 1 X 2.5 SQMM",
+                "BRANCH CONNECTOR  | (70/25)",
+                "BRANCH CONNECTOR  | (70/ 70)",
+                "CONDUITS-PIPES INSTALLATION | 25MM DIA,  FOR EARTH STURBAB",
+                "CONDUITS-PIPES INSTALLATION | 100MM DIA , FOR STURBAB",
+                "CONDUITS-PIPES INSTALLATION | 150MM DIA , FOR CROSSING ",
+                "CONDUITS-PIPES INSTALLATION | 200MM DIA , FOR CROSSING ",
                 "JB INSTALLATION",
-                "PLC PANEL INSTALLATION",
-                "IFB PANEL INSTALLATION",
-                "PATCH PANEL INSTALLATION",
-                "PLC INTERNAL WIRING",
-                "IFM MODULE INSTALLATION",
-                "TUBING",
-                "TRAY AND TRUNKING INSTALLATION"
+                "PANEL INSTALLATION | IFB",
+                "PANEL INSTALLATION | PLC",
+                "PANEL INSTALLATION | RTU",
+                "PANEL INSTALLATION | FO PATCH ",
+                "PANEL INSTALLATION | TELECOM",
+                "CONCRETE DUCT BANKS INSTALLATION",
+                "CONCRETE BLOCK INSTALLATION | 350X350X550H",
+                "CONCRETE BLOCK INSTALLATION | 500X500X500H",
+                "NAME PLATES INSTALLATION",
+                "KOPEX CONDUIT INSTALLATION",
+                "CABLE TRAY | PERFORATED |50MM TRAY",
+                "TRAY COVER | PERFORATED |50MM TRAY COVER",
+                "CABLE TRAY | PERFORATED |100MM TRAY",
+                "TRAY COVER | PERFORATED |100MM TRAY COVER",
+                "CABLE TRAY | PERFORATED |150MM TRAY",
+                "TRAY COVER | PERFORATED |150MM TRAY COVER",
+                "CABLE TRAY | PERFORATED |300MM TRAY",
+                "TRAY COVER | PERFORATED |300MM TRAY COVER",
+                "CABLE TRAY | LADDER | 300MM TRAY",
+                "TRAY COVER | LADDER | 300MM TRAY COVER",
+                "CABLE TRAY | LADDER | 450MM TRAY",
+                "TRAY COVER | LADDER | 450MM TRAY COVER",
+                "CABLE TRAY SUPPORT | ANGLE 50X50X6MM",
+                "CABLE TRAY SUPPORT | CHANNEL 100X50X6X8 MM",
+                "INSTRUMENT INSTALLATION | PRESSURE TRANSMITTER",
+                "INSTRUMENT INSTALLATION | ULTRASONIC FLOWMETER",
+                "INSTRUMENT INSTALLATION | TEMPERATURE TRANSMITTER",
+                "INSTRUMENT INSTALLATION | RESET PUSH BUTTON",
+                "INSTRUMENT INSTALLATION | PRESSURE GAUGE",
+                "INSTRUMENT INSTALLATION | LEVEL TRANSMITTER- GWR TYPE",
+                "INSTRUMENT INSTALLATION | LOOP POWERED INDICATOR",
+                "INSTRUMENT INSTALLATION | LEVEL TRANSMITTER- DP TYPE",
+                "INSTRUMENT INSTALLATION | LEVEL GAUGE - MAGNETIC",
+                "F&G INSTALLATION | HEAT DETECTOR",
+                "F&G INSTALLATION | SMOKE DETECTOR",
+                "F&G INSTALLATION | OPEN PATH GAS DETECTOR",
+                "F&G INSTALLATION | POINT TYPE GAS DETECTOR",
+                "F&G INSTALLATION | SIREN/SOUNDER",
+                "F&G INSTALLATION | BEACON",
+                "F&G INSTALLATION | FLAME DETECTOR (UV/IR , IR)",
+                "F&G INSTALLATION | H2S DETECTOR",
+                "F&G INSTALLATION | HYDROGEN DETECTOR",
+                "SUPPORT INSTALLATION | HEAT DETECTOR",
+                "SUPPORT INSTALLATION | SMOKE DETECTOR",
+                "SUPPORT INSTALLATION | OPEN PATH GAS DETECTOR",
+                "SUPPORT INSTALLATION | POINT TYPE GAS DETECTOR",
+                "SUPPORT INSTALLATION | SIREN/SOUNDER",
+                "SUPPORT INSTALLATION | BEACON",
+                "SUPPORT INSTALLATION | FLAME DETECTOR (UV/IR , IR)",
+                "SUPPORT INSTALLATION | H2S DETECTOR",
+                "SUPPORT INSTALLATION | HYDROGEN DETECTOR",
+                "JB SUPPORTS INSTALLATION | JBS-1B (SINGLE JB)",
+                "JB SUPPORTS INSTALLATION | JBS-2B (DUAL JB )",
+                "SUN SHADE INSTALLATION",
+                "PLC | DIN RAIL MOUNTED 24VDC RELAY",
+                "PLC INTERNAL WIRING | 1.0 SQ.MM",
+                "PLC INTERNAL WIRING | I/O WIRING FROM I/O CARD TO IFM TO MARSHALLING TB ",
+                "PLC | I/O CARDS (AI/DI/AO/DO)",
+                "PLC | IFM MODULES (AI/AO/DI/DO)",
+                "PLC | DC POWER SUPPLY UNITS(RACK POWER)",
+                "PLC | I/O WIRING FROM I/O CARD TO IFM TO MARSHALLING TB ",
+                "PLC | DIN RAIL INSTALLATION",
+                "PLC | ETHERNET SWITCH",
+                "TUBING | 1/2\" OD, UNION COMPRESSION TEE, SS316",
+                "TUBING | MALE CONNECTOR, DOUBLE COMPRESSION TYPE 1/2\"OD X 1/2\" NPT",
+                "TUBING | MALE CONNECTOR, DOUBLE COMPRESSION TYPE 1/2\"OD X 1/4\"",
+                "TUBING | MALE CONNECTOR, DOUBLE COMPRESSION TYPE 3/8\"OD x 1/4\" NPT",
+                "TUBING | MALE CONNECTOR, DOUBLE COMPRESSION TYPE 3/8\"OD x 1/2\" NPT",
+                "TUBING | MALE CONNECTOR, DOUBLE COMPRESSION TYPE  1/4\"OD X 1/4\" NPT",
+                "TUBING | FEMALE CONNECTOR, DOUBLE COMPRESSION TYPE 1/2\"OD X 1\" NPT",
+                "TUBING | UNION 1/2\"OD",
+                "TUBING | UNION 3/8\"OD ",
+                "TUBING | END CAP,1/2\" OD , DOUBLE COMPRESSION TYPE",
+                "TUBING | NEEDLE VALVE, 1/2\" NPT",
+                "TUBING | 2 VALVE ISOLATE MANIFOLD 1/2\"NPT(F) x 1/2\"NPT(F) ",
+                "TUBING | TUBING 1/2\" OD WALL THK. 0.065\" ",
+                "TUBING | TUBING 3/8\" OD WALL THK. 0.065\"",
+                "TUBING | TUBING 1/4\" OD WALL THK. 0.049\" ",
+                "TUBING | CONCENTRIC PIPE NIPPLE 1/2\"NPT(M) x 1/2\"NPT(M) ",
+                "FUNCTION TEST & CALIBRATION| INSTRUMENTS",
+                "FUNCTION TEST & CALIBRATION| F&G",
+                "FUNCTION TEST & CALIBRATION| CONTROL VALVE",
+                "FUNCTION TEST & CALIBRATION| ESD VALVE",
+                "FUNCTION TEST & CALIBRATION| PRV "
             ],
             "COMMISSIONING": [
                 "LOOP TESTING",
@@ -365,6 +471,23 @@
                     option.textContent = activity;
                     activityDropdown.appendChild(option);
                 });
+                const otherOption = document.createElement("option");
+                otherOption.value = "Other";
+                otherOption.textContent = "Other";
+                activityDropdown.appendChild(otherOption);
+            }
+        }
+
+        // Function to toggle the custom activity input
+        function toggleCustomActivityInput() {
+            const activityDropdown = document.getElementById("modalActivity");
+            const customActivityInput = document.getElementById("customActivity");
+            if (activityDropdown.value === "Other") {
+                customActivityInput.style.display = "block";
+                customActivityInput.required = true;
+            } else {
+                customActivityInput.style.display = "none";
+                customActivityInput.required = false;
             }
         }
 
@@ -380,14 +503,20 @@
             document.getElementById("modalActivity").innerHTML = '<option value="">Select Activity</option>'; // Reset
             document.getElementById("modalQuantity").value = ""; // Reset
             document.getElementById("modalUnit").value = ""; // Reset
+            document.getElementById("customActivity").value = ""; // Reset
+            document.getElementById("customActivity").style.display = "none"; // Reset
         }
 
         // Add entry to the table
         function addEntry() {
             const discipline = document.getElementById("modalDiscipline").value;
-            const activity = document.getElementById("modalActivity").value;
+            let activity = document.getElementById("modalActivity").value;
             const quantity = document.getElementById("modalQuantity").value;
             const unit = document.getElementById("modalUnit").value;
+
+            if (activity === "Other") {
+                activity = document.getElementById("customActivity").value;
+            }
 
             if (discipline && activity && quantity && unit) {
                 progressEntries.push({
@@ -467,7 +596,6 @@
                 progressEntries = [];
                 updateProgressTable();
                 document.getElementById("progressForm").reset();
-                setTodaysDate(); // Reset the date to today's date after submission
             })
             .catch(error => {
                 alert("Error: " + error);
